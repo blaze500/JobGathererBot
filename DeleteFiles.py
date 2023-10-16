@@ -3,7 +3,7 @@ import shutil
 
 def DeleteJobFiles():
 
-    fileNames=["atLeastOneOfWords.txt", "mustHaveWords.txt", "LinkedinJobs.csv", "RefinedLinkedInJobCSV.csv"]
+    fileNames=["LinkedinJobs.csv", "RefinedLinkedInJobCSV.csv", "IndeedJobs.csv", "RefinedIndeedJobCSV.csv"]
     for file in fileNames:
         if os.path.exists(file):
             # Due to windows giving a "[WinError 5] Access is denied python" for os.remove in python
