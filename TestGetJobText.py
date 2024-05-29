@@ -37,14 +37,63 @@ class JobTextGrabberTest:
 
 
     def grabLinkedInJobInfo(self):
-        jobDescriptionTextHTML = self.seleniumDriver.find_element(By.CLASS_NAME, "jobs-unified-top-card__primary-description")
+        infoString=""
+        jobDescriptionTextHTML = self.seleniumDriver.find_element(By.CLASS_NAME, "job-details-jobs-unified-top-card__job-title")
+        title=html2text.html2text(jobDescriptionTextHTML.get_attribute("innerHTML")).replace("\n", "")
+        print("Passed 4")
+        infoString= title.replace(",", "") + ","
+        jobDescriptionTextHTML = self.seleniumDriver.find_element(By.CLASS_NAME, "job-details-jobs-unified-top-card__primary-description-container")
         text=html2text.html2text(jobDescriptionTextHTML.get_attribute("innerHTML")).replace("\n", "").replace("*", "")
-        print(text +"\n")
-        splitText=text.split(" · ")
-        splitText[0] = re.sub("\[|\]|\(http.+\)", "", splitText[0])
-        print(splitText[0])
-        splitText[1] = re.split("\(|\)", splitText[1])
-        print(splitText[1])
-        splitText[2] = splitText[2].replace("*", "")
-        print(splitText[2])
-        print("\n\n\n")
+        print("Passed 5")
+        print(text)
+        splitText=text.split("·")
+        print(splitText)
+        infoString += re.sub("\[|\]|\(http.+\)|,", "", splitText[0]) + "," + re.sub(",", "", splitText[1]) + ","
+
+        SalaryAmdRemote = self.seleniumDriver.find_element(By.CLASS_NAME,
+                                                                  "job-details-jobs-unified-top-card__job-insight")
+        text2 = html2text.html2text(SalaryAmdRemote.get_attribute("innerHTML")).replace("\n", "").replace(",","")
+        text2= re.sub(r"\s+-\s+", "-", text2)
+        text2 = re.sub(r"\s+level", "-level", text2)
+        print(text2)
+
+        categories = text2.split()
+        print(categories)
+        location=categories[0]
+
+        salary="No Salary Found"
+
+        if "$" in categories[0]:
+           salary=categories[0]
+           location=categories[1]
+
+        infoString += location + "," + splitText[2] + "," + splitText[3] + "," + salary
+        print(infoString)
+
+        """
+        splitText1 = re.split("(?=\d)", re.sub(" +", " " ,splitText[2].replace(",", " ").replace("Reposted", '')), 1)
+
+        print(splitText1)
+        print(splitText1[0])
+        print(splitText1[1])
+
+        if ("second" in splitText1[1]) or ("minute" in splitText1[1]) or ("hour" in splitText1[1]):
+            splitText1[1] = str(datetime.date.today().strftime("%m/%d/%Y"))
+            print(splitText1[1])
+        elif "day" in splitText1[1]:
+            splitText1[1] = str((datetime.date.today() - datetime.timedelta(days=int(re.findall(r'\d+', splitText1[1])[0]))).strftime("%m/%d/%Y"))
+            print(splitText1[1])
+        elif "week" in splitText1[1]:
+            splitText1[1] = str((datetime.date.today() - datetime.timedelta(days=7 * int(re.findall(r'\d+', splitText1[1])[0]))).strftime("%m/%d/%Y"))
+            print(splitText1[1])
+        elif "month" in splitText1[1]:
+            splitText1[1] = str((datetime.date.today() - datetime.timedelta(days=31 * int(re.findall(r'\d+', splitText1[1])[0]))).strftime("%m/%d/%Y"))
+            print(splitText1[1])
+
+        infoString += ",".join(splitText1) + ","
+
+
+        infoString += splitText[2].replace("*", "").replace(",", "") + ","
+        """
+        return str(infoString)
+

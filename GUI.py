@@ -3,6 +3,7 @@ import Webscraper_JobFinder as JobFinder
 import DeleteFiles
 import SendEmailToMyself
 import pandas as pd
+import sys
 
 class GUI:
 
@@ -17,13 +18,14 @@ class GUI:
         self.DoProgram()
 
     def DoProgram(self):
+        sys.stdout = open("report.txt", "w")
+
         self.JobFinder.LoginToJobs()
         self.JobFinder.GetJobLinks()
         self.JobFinder.RefineJobLinks()
         self.JobFinder.EndProgram()
-        results = pd.read_csv('RefinedLinkedInJobCSV.csv')
-        if len(results) > 0:
-            SendEmailToMyself.sendEmailToMyself()
+        sys.stdout.close()
+        SendEmailToMyself.sendEmailToMyself()
 
 
     def Questionare(self):

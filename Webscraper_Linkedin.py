@@ -2,10 +2,14 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import undetected_chromedriver as uc
 import os
 import regex as re
 import html2text
 import math
+from pynput.keyboard import Key, Controller
+
 
 class LinkedinJobs:
 
@@ -115,18 +119,19 @@ class LinkedinJobs:
     # And waits for the page to load with the jobs
     def linkToHTML(self, link):
         #Gets URL, add .content to turn it into something readable
-        self.seleniumDriver.get(link.strip())
-        time.sleep(5)
-        try:
-            WebDriverWait(self.seleniumDriver, 10).until(
-                EC.presence_of_element_located((By.TAG_NAME, "li"))
-            )
-        except:
-            #self.seleniumDriver.quit()
-            #self.seleniumDriver.close()
-            return None
+            print("In The Link Algorithm")
+            self.seleniumDriver.get(link.strip())
+            time.sleep(5)
+            print("Next Phase Of Link Algorithm")
+            try:
+                WebDriverWait(self.seleniumDriver, 10).until(
+                    EC.presence_of_element_located((By.TAG_NAME, "li"))
+                )
+                time.sleep(2)
+            except:
+                return None
 
-        return self.seleniumDriver.find_elements(By.TAG_NAME, "a")
+            return self.seleniumDriver.find_elements(By.TAG_NAME, "a")
 
 
 
@@ -140,6 +145,7 @@ class LinkedinJobs:
     # The skeleton of the search algorithm for gathering each webpage that contains
     # job links.
     def findLinks(self):
+        self.ErrorLink = ""
         link = self.LinkedinJobsLink
         page = 1
         stopOnPage = 40
@@ -148,8 +154,8 @@ class LinkedinJobs:
             open(self.writeTo + '.csv', 'x')
         if not os.path.exists('previousLinkedinJobs.csv'):
             open('previousLinkedinJobs.csv', 'x')
+        self.seleniumDriver.get(link.strip())
         try:
-            self.seleniumDriver.get(link.strip())
             time.sleep(5)
             numberOfJobsTextHTML = self.seleniumDriver.find_element(By.CLASS_NAME, "jobs-search-results-list__subtitle")
             numberOfJobs=html2text.html2text(numberOfJobsTextHTML.get_attribute("innerHTML")).replace("\n", "")
@@ -184,6 +190,8 @@ class LinkedinJobs:
             else:
                 print("Did not find what you are looking for!")
                 break
+
+
         print("Task Ended Sucessfully")
 
 

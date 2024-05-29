@@ -5,8 +5,9 @@ from email.mime.base import MIMEBase
 from email import encoders
 
 def sendEmailToMyself():
-    fromaddr = ""
-    toaddr = ""
+    emailMyselfInfo = open('EmailMyselfInfo.txt', 'r', encoding="utf-8").read().splitlines()
+    fromaddr = emailMyselfInfo[0]
+    toaddr = emailMyselfInfo[1]
     msg = MIMEMultipart()
     msg['From'] = fromaddr
     msg['To'] = toaddr
@@ -22,7 +23,7 @@ def sendEmailToMyself():
     msg.attach(p)
     s = smtplib.SMTP('smtp.gmail.com', 587)
     s.starttls()
-    s.login(fromaddr, "")
+    s.login(fromaddr, emailMyselfInfo[2])
     text = msg.as_string()
     s.sendmail(fromaddr, toaddr, text)
     s.quit()

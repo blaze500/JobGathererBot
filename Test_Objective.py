@@ -48,18 +48,21 @@ class JobFinder:
 
 
 
+        linkedInLoginFile = open('LinkedInLogin.txt', 'r', encoding="utf-8")
+        linkedInLoginInfo = linkedInLoginFile.read().splitlines()
+
         self.seleniumDriver.get("https://www.linkedin.com/login")
 
-        time.sleep(2)
-
-        self.seleniumDriver.find_element(By.ID, "username").send_keys("jobautomatorbottestacc@gmail.com")
         time.sleep(5)
-        self.seleniumDriver.find_element(By.ID, "password").send_keys("fakepassword")
+
+        self.seleniumDriver.find_element(By.ID, "username").send_keys(linkedInLoginInfo[0])
+        time.sleep(5)
+        self.seleniumDriver.find_element(By.ID, "password").send_keys(linkedInLoginInfo[1])
         time.sleep(5)
         button = self.seleniumDriver.find_element(By.CSS_SELECTOR, "[aria-label='Sign in']")
         self.seleniumDriver.execute_script("arguments[0].click();", button)
 
-        time.sleep(2)
+        time.sleep(5)
 
         self.RefineJobLinks()
 
@@ -69,7 +72,7 @@ class JobFinder:
 
         getJobText = TestGetJobText.JobTextGrabberTest(self.seleniumDriver)
 
-        links = []
+        links = ["https://www.linkedin.com/jobs/view/3790281597/","https://www.linkedin.com/jobs/view/3792747945/","https://www.linkedin.com/jobs/view/3773281107/"]
 
         getJobText.getLinkedinJobText(links)
         #getJobText.getIndeedJobText("IndeedJobs")
