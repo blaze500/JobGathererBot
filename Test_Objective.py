@@ -72,7 +72,7 @@ class JobFinder:
 
         getJobText = TestGetJobText.JobTextGrabberTest(self.seleniumDriver)
 
-        links = ["https://www.linkedin.com/jobs/view/3790281597/","https://www.linkedin.com/jobs/view/3792747945/","https://www.linkedin.com/jobs/view/3773281107/"]
+        links = ["https://www.linkedin.com/jobs/view/3921125336/", "https://www.linkedin.com/jobs/view/3918744243/", "https://www.linkedin.com/jobs/view/3992372933/", "https://www.linkedin.com/jobs/view/4045414207"]
 
         getJobText.getLinkedinJobText(links)
         #getJobText.getIndeedJobText("IndeedJobs")

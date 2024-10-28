@@ -8,8 +8,6 @@ import os
 import regex as re
 import html2text
 import math
-from pynput.keyboard import Key, Controller
-
 
 class LinkedinJobs:
 
@@ -155,6 +153,8 @@ class LinkedinJobs:
         if not os.path.exists('previousLinkedinJobs.csv'):
             open('previousLinkedinJobs.csv', 'x')
         self.seleniumDriver.get(link.strip())
+
+        #Checks to see if it can find the number of postings then converts them into page numbers, so the scraper doesnt look over blank pages, thus saving time.
         try:
             time.sleep(5)
             numberOfJobsTextHTML = self.seleniumDriver.find_element(By.CLASS_NAME, "jobs-search-results-list__subtitle")

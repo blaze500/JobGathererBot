@@ -9,7 +9,7 @@ class GUI:
 
     #Starts the Program
     def __init__(self):
-        os.chdir("/Users/EpicGamerDude/PycharmProjects/pythonProject1")
+        os.chdir("/Users/jaden/PycharmProjects/JobGathererBot")
         DeleteFiles.DeleteJobFiles()
         self.Questionare()
 
@@ -18,13 +18,16 @@ class GUI:
         self.DoProgram()
 
     def DoProgram(self):
+        #Is writting down any print statements into a file so that it can be checked in case there have been site changes/errors
         sys.stdout = open("report.txt", "w")
 
         self.JobFinder.LoginToJobs()
         self.JobFinder.GetJobLinks()
         self.JobFinder.RefineJobLinks()
         self.JobFinder.EndProgram()
+
         sys.stdout.close()
+
         SendEmailToMyself.sendEmailToMyself()
 
 

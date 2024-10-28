@@ -4,6 +4,7 @@ import csv
 import html2text
 import re
 import os
+import datetime
 
 class JobTextGrabberTest:
 
@@ -37,63 +38,67 @@ class JobTextGrabberTest:
 
 
     def grabLinkedInJobInfo(self):
-        infoString=""
-        jobDescriptionTextHTML = self.seleniumDriver.find_element(By.CLASS_NAME, "job-details-jobs-unified-top-card__job-title")
-        title=html2text.html2text(jobDescriptionTextHTML.get_attribute("innerHTML")).replace("\n", "")
-        print("Passed 4")
-        infoString= title.replace(",", "") + ","
-        jobDescriptionTextHTML = self.seleniumDriver.find_element(By.CLASS_NAME, "job-details-jobs-unified-top-card__primary-description-container")
-        text=html2text.html2text(jobDescriptionTextHTML.get_attribute("innerHTML")).replace("\n", "").replace("*", "")
-        print("Passed 5")
-        print(text)
-        splitText=text.split("·")
+        # The string that will be put into the CSV
+        infoString = ""
+
+        # The title of the job
+        jobTitle = self.seleniumDriver.find_element(By.CLASS_NAME, "job-details-jobs-unified-top-card__job-title").text.replace(",", "")
+        print(jobTitle)
+
+        # The company of the job
+        jobCompanyName = self.seleniumDriver.find_element(By.CLASS_NAME,
+                                                          "job-details-jobs-unified-top-card__company-name").text.replace(",", "")
+        print(jobCompanyName)
+
+        # The location, time the application has been open, and number of applicants
+        jobInfo1 = self.seleniumDriver.find_element(By.CLASS_NAME,
+                                                    "job-details-jobs-unified-top-card__primary-description-container").text.replace(
+            ",", "")
+        print(jobInfo1)
+
+        # The (Salary), Remote or In person, Fulltime or Part Time, and Skills/missing skills of job. This is only important for the first 3 things, ignore the rest.
+        jobInfo2 = self.seleniumDriver.find_element(By.CLASS_NAME, "job-details-preferences-and-skills").text.replace(
+            ",", "")
+        print(jobInfo2)
+
+        splitText = jobInfo1.split(" · ")
         print(splitText)
-        infoString += re.sub("\[|\]|\(http.+\)|,", "", splitText[0]) + "," + re.sub(",", "", splitText[1]) + ","
 
-        SalaryAmdRemote = self.seleniumDriver.find_element(By.CLASS_NAME,
-                                                                  "job-details-jobs-unified-top-card__job-insight")
-        text2 = html2text.html2text(SalaryAmdRemote.get_attribute("innerHTML")).replace("\n", "").replace(",","")
-        text2= re.sub(r"\s+-\s+", "-", text2)
-        text2 = re.sub(r"\s+level", "-level", text2)
-        print(text2)
+        splitText2 = jobInfo2.split("\n")
+        print(splitText2)
 
-        categories = text2.split()
-        print(categories)
-        location=categories[0]
+        # Converts the length of time the job has been to a numerical date
+        if ("second" in splitText[1]) or ("minute" in splitText[1]) or ("hour" in splitText[1]):
+            splitText[1] = str(datetime.date.today().strftime("%m/%d/%Y"))
+            print(splitText[1])
+        elif "day" in splitText[1]:
+            splitText[1] = str(
+                (datetime.date.today() - datetime.timedelta(days=int(re.findall(r'\d+', splitText[1])[0]))).strftime(
+                    "%m/%d/%Y"))
+            print(splitText[1])
+        elif "week" in splitText[1]:
+            splitText[1] = str((datetime.date.today() - datetime.timedelta(
+                days=7 * int(re.findall(r'\d+', splitText[1])[0]))).strftime("%m/%d/%Y"))
+            print(splitText[1])
+        elif "month" in splitText[1]:
+            splitText[1] = str((datetime.date.today() - datetime.timedelta(
+                days=31 * int(re.findall(r'\d+', splitText[1])[0]))).strftime("%m/%d/%Y"))
+            print(splitText[1])
 
-        salary="No Salary Found"
+        infoString += jobTitle + "," + jobCompanyName + ","
 
-        if "$" in categories[0]:
-           salary=categories[0]
-           location=categories[1]
+        # Putting all the info together. Checks to see if there is a salary or not before doing.
+        if "/yr" in splitText2[0]:
+            infoString += splitText[0] + "," + splitText2[1] + "," + splitText[1] + "," + splitText[2] + "," + \
+                          splitText2[2] + ","
+            splitText2[0] = re.sub("/yr,", "", splitText2[0]).replace(" ", "")
+            infoString += re.sub("\++,", "", splitText2[0])
+        else:
+            infoString += splitText[0] + "," + splitText2[0] + "," + splitText[1] + "," + splitText[2] + "," + \
+                          splitText2[1] + "," + "No Salary Found"
 
-        infoString += location + "," + splitText[2] + "," + splitText[3] + "," + salary
+
+
         print(infoString)
-
-        """
-        splitText1 = re.split("(?=\d)", re.sub(" +", " " ,splitText[2].replace(",", " ").replace("Reposted", '')), 1)
-
-        print(splitText1)
-        print(splitText1[0])
-        print(splitText1[1])
-
-        if ("second" in splitText1[1]) or ("minute" in splitText1[1]) or ("hour" in splitText1[1]):
-            splitText1[1] = str(datetime.date.today().strftime("%m/%d/%Y"))
-            print(splitText1[1])
-        elif "day" in splitText1[1]:
-            splitText1[1] = str((datetime.date.today() - datetime.timedelta(days=int(re.findall(r'\d+', splitText1[1])[0]))).strftime("%m/%d/%Y"))
-            print(splitText1[1])
-        elif "week" in splitText1[1]:
-            splitText1[1] = str((datetime.date.today() - datetime.timedelta(days=7 * int(re.findall(r'\d+', splitText1[1])[0]))).strftime("%m/%d/%Y"))
-            print(splitText1[1])
-        elif "month" in splitText1[1]:
-            splitText1[1] = str((datetime.date.today() - datetime.timedelta(days=31 * int(re.findall(r'\d+', splitText1[1])[0]))).strftime("%m/%d/%Y"))
-            print(splitText1[1])
-
-        infoString += ",".join(splitText1) + ","
-
-
-        infoString += splitText[2].replace("*", "").replace(",", "") + ","
-        """
         return str(infoString)
 
